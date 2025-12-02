@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+import ticketRoutes from "./routes/ticket.js";
+import userRoutes from "./routes/user.js";
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +15,10 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
+// Mount API routes
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/auth", userRoutes);
 
 // Simple test route
 app.get("/", (req, res) => {

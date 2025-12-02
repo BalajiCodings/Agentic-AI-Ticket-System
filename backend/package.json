@@ -8,7 +8,9 @@
     "test": "node server.js",
     "bala": "node index.js",
     "dev": "nodemon index.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "inngest:runner": "node inngest/runner.js",
+    "inngest-dev": "npx inngest-cli@latest dev"
   },
   "repository": {
     "type": "git",
@@ -23,6 +25,7 @@
   "homepage": "https://github.com/BalajiCodings/Agentic-AI-Ticket-System#readme",
   "dependencies": {
     "dotenv": "^17.2.3",
+    "@inngest/agent-kit": "^0.8.0",
     "express": "^5.1.0",
     "inngest": "^3.45.0",
     "mongoose": "^8.19.3"
