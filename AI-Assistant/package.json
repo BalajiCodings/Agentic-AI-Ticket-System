@@ -1,0 +1,21 @@
+{
+  "name": "agentic-ai-ticket-system",
+  "version": "1.0.0",
+  "description": "Automation",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "inngest-dev": "npx inngest-cli@latest dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "inngest": "^3.46.0",
+    "mongoose": "^8.19.3"
+  }
+}
