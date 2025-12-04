@@ -1,33 +1,21 @@
 {
-  "name": "agenticai-ticket-system",
+  "name": "agentic-ai-ticket-system",
   "version": "1.0.0",
-  "description": "",
+  "description": "Automation",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node server.js",
-    "bala": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "nodemon server.js",
     "start": "node server.js",
-    "inngest:runner": "node inngest/runner.js",
     "inngest-dev": "npx inngest-cli@latest dev"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BalajiCodings/Agentic-AI-Ticket-System.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/BalajiCodings/Agentic-AI-Ticket-System/issues"
-  },
-  "homepage": "https://github.com/BalajiCodings/Agentic-AI-Ticket-System#readme",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "@inngest/agent-kit": "^0.8.0",
     "express": "^5.1.0",
-    "inngest": "^3.45.0",
+    "inngest": "^3.46.0",
     "mongoose": "^8.19.3"
   }
 }

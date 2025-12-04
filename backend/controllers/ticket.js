@@ -1,58 +1,77 @@
 import Ticket from "../models/ticket.js";
-import { sendEvent } from "../inngest/client.js";
 
-// Create a new ticket and emit `ticket.created` event to Inngest.
 export const createTicket = async (req, res) => {
   try {
-    const { title, description, relatedSkills, priority, deadline } = req.body;
-
-    const ticket = new Ticket({
+    const { title, description } = req.body;
+    if (!title || !description) {
+      return res.status(400).json({ message: "Title and description are required" });
+    }
+    const newTicket = await Ticket.create({
       title,
       description,
-      relatedSkills: relatedSkills || [],
-      priority: priority || "medium",
-      deadline: deadline || null,
-      createdBy: req.user ? req.user.id : null,
+      createdBy: req.user._id.toString(),
     });
-
-    const saved = await ticket.save();
-
-    // Fire-and-forget: notify Inngest about the new ticket.
-    // We don't await here to avoid slowing the HTTP response.
-    sendEvent("ticket.created", { ticket: saved }).catch(() => {});
-
-    return res.status(201).json(saved);
+    try {
+      const { inngest } = await import("../inngest/client.js");
+      if (inngest?.send) {
+        await inngest.send({
+          name: "ticket/created",
+          data: {
+            ticketId: newTicket._id.toString(),
+            title,
+            description,
+            createdBy: req.user._id.toString(),
+          },
+        });
+      }
+    } catch (err) {}
+    return res.status(201).json({
+      message: "Ticket created and processing started",
+      ticket: newTicket,
+    });
   } catch (error) {
-    console.error("createTicket error:", error);
-    return res.status(500).json({ error: "Unable to create ticket" });
+    console.error("Error creating ticket", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const getTickets = async (req, res) => {
   try {
-    // Return tickets created by the logged-in user.
-    const userId = req.user ? req.user.id : null;
-    const tickets = await Ticket.find({ createdBy: userId }).sort({ createdAt: -1 });
-    return res.json(tickets);
+    const user = req.user;
+    let tickets = [];
+    if (user.role !== "user") {
+      tickets = await Ticket.find({})
+        .populate("assignedTo", ["email", "_id"])
+        .sort({ createdAt: -1 });
+    } else {
+      tickets = await Ticket.find({ createdBy: user._id })
+        .select("title description status createdAt")
+        .sort({ createdAt: -1 });
+    }
+    return res.status(200).json(tickets);
   } catch (error) {
-    console.error("getTickets error:", error);
-    return res.status(500).json({ error: "Unable to get tickets" });
+    console.error("Error fetching tickets", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const getTicket = async (req, res) => {
   try {
-    const ticket = await Ticket.findById(req.params.id);
-    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
-
-    // Simple ownership check: only creator may fetch (adjust for roles later)
-    if (req.user && String(ticket.createdBy) !== String(req.user.id)) {
-      return res.status(403).json({ error: "Access denied" });
+    const user = req.user;
+    let ticket;
+    if (user.role !== "user") {
+      ticket = await Ticket.findById(req.params.id).populate("assignedTo", ["email", "_id"]);
+    } else {
+      ticket = await Ticket.findOne({ createdBy: user._id, _id: req.params.id }).select(
+        "title description status createdAt"
+      );
     }
-
-    return res.json(ticket);
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+    return res.status(200).json({ ticket });
   } catch (error) {
-    console.error("getTicket error:", error);
-    return res.status(500).json({ error: "Unable to get ticket" });
+    console.error("Error fetching ticket", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
