@@ -15,7 +15,7 @@ Automatic matching of tickets to moderators based on skills
 Fallback to admin assignment if no matching moderator found Skill-based routing system
 
 User Management 
-Role-based access control (User, Moderator, Admin) 
+Role-based access control (User, Moderator, Admin)  
 Skill management for moderators 
 User authentication with JWT Background Processing
 
